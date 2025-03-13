@@ -1,16 +1,17 @@
 # Import necessary modules and classes
+import os
 import logging
 import threading
 import sys
 from datetime import datetime
 
-
+# Import from your main source code file (which I assume is named something like fds.py)
 from fds import (
     RealTimeDataIngestionManager, 
     seed_sample_data, 
     HistoricalDataCollector, 
     EnhancedAIFraudDashboard, 
-    add_novelty_detection_page
+    setup_multi_page_dashboard 
 )
 
 def main():
@@ -56,7 +57,7 @@ def main():
         dashboard = EnhancedAIFraudDashboard(data_manager)
         
         print("Setting up novelty detection...")
-        add_novelty_detection_page(dashboard, data_manager) 
+        setup_multi_page_dashboard(dashboard, data_manager)
         
         # Connect dashboard to data manager
         data_manager.dashboard = dashboard
@@ -65,7 +66,7 @@ def main():
         print("Starting data collection thread...")
         collection_thread = threading.Thread(
             target=data_manager.start_periodic_collection,
-            kwargs={'collection_interval_minutes': 15, 'forecast_interval_hours': 6},
+            kwargs={'collection_interval_minutes': 15,},
             daemon=True
         )
         collection_thread.start()
@@ -73,14 +74,14 @@ def main():
         # Start dashboard in main thread
         print("Starting dashboard at http://localhost:8050")
         print("Press Ctrl+C to stop the server")
-        dashboard.run(debug=True, port=8050)
+        dashboard.run(debug=False,port=int(os.environ.get('PORT', 8050)))
         
     except Exception as e:
         logger.error(f"Critical error in AI Fraud Detection System: {e}")
         import traceback
         traceback.print_exc()
 
-
+# Add this block to run the script directly
 if __name__ == "__main__":
     import sys
     
